@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="max-width:560px; margin:0 auto;">
+  <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.2rem;">
+    <a href="{{ url_for('index') }}" style="color:#6c757d; text-decoration:none; font-size:0.9rem;">← Voltar</a>
+    <h2 style="font-size:1.3rem;">{{ action }} Registro</h2>
+  </div>
+
+  <div class="card">
+    <form method="POST">
+      <div style="display:grid; grid-template-columns:1fr 2fr; gap:1rem; margin-bottom:1rem;">
+        <div>
+          <label style="display:block; font-size:0.85rem; font-weight:600; color:#555; margin-bottom:0.35rem;">
+            Código do País *
+          </label>
+          <input
+            type="text"
+            name="country_code"
+            value="{{ record.country_code or '' }}"
+            maxlength="3"
+            placeholder="BRA"
+            required
+            style="width:100%; padding:0.55rem 0.75rem; border:1px solid #ddd; border-radius:6px; font-size:0.95rem; text-transform:uppercase; outline:none;"
+            onfocus="this.style.borderColor='#0f3460'" onblur="this.style.borderColor='#ddd'"
+          />
+        </div>
+        <div>
+          <label style="display:block; font-size:0.85rem; font-weight:600; color:#555; margin-bottom:0.35rem;">
+            Nome do País *
+          </label>
+          <input
+            type="text"
+            name="country_name"
+            value="{{ record.country_name or '' }}"
+            placeholder="Brasil"
+            required
+            style="width:100%; padding:0.55rem 0.75rem; border:1px solid #ddd; border-radius:6px; font-size:0.95rem; outline:none;"
+            onfocus="this.style.borderColor='#0f3460'" onblur="this.style.borderColor='#ddd'"
+          />
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+        <div>
+          <label style="display:block; font-size:0.85rem; font-weight:600; color:#555; margin-bottom:0.35rem;">
+            Ano *
+          </label>
+          <input
+            type="number"
+            name="year"
+            value="{{ record.year or '' }}"
+            min="1900"
+            max="2100"
+            placeholder="2023"
+            required
+            style="width:100%; padding:0.55rem 0.75rem; border:1px solid #ddd; border-radius:6px; font-size:0.95rem; outline:none;"
+            onfocus="this.style.borderColor='#0f3460'" onblur="this.style.borderColor='#ddd'"
+          />
+        </div>
+        <div>
+          <label style="display:block; font-size:0.85rem; font-weight:600; color:#555; margin-bottom:0.35rem;">
+            PIB (bilhões USD) *
+          </label>
+          <input
+            type="number"
+            name="gdp_billion"
+            value="{{ record.gdp_billion or '' }}"
+            min="0"
+            step="0.01"
+            placeholder="2060.00"
+            required
+            style="width:100%; padding:0.55rem 0.75rem; border:1px solid #ddd; border-radius:6px; font-size:0.95rem; outline:none;"
+            onfocus="this.style.borderColor='#0f3460'" onblur="this.style.borderColor='#ddd'"
+          />
+        </div>
+      </div>
+
+      <div style="display:flex; gap:0.75rem; justify-content:flex-end;">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary">{{ action }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

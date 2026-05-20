@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.2rem; flex-wrap:wrap; gap:0.75rem;">
+  <h2 style="font-size:1.3rem;">Registros de PIB</h2>
+  <a href="{{ url_for('create') }}" class="btn btn-success">+ Novo Registro</a>
+</div>
+
+<div class="card" style="margin-bottom:1rem; padding:1rem 1.5rem;">
+  <form method="GET" action="{{ url_for('index') }}" style="display:flex; gap:0.75rem; align-items:center;">
+    <input
+      type="text"
+      name="search"
+      value="{{ search }}"
+      placeholder="Buscar por país ou código..."
+      style="flex:1; padding:0.5rem 0.75rem; border:1px solid #ddd; border-radius:6px; font-size:0.9rem; outline:none;"
+    />
+    <button type="submit" class="btn btn-primary">Buscar</button>
+    {% if search %}
+      <a href="{{ url_for('index') }}" class="btn btn-secondary">Limpar</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="card">
+  {% if records %}
+  <div style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f8f9fa; border-bottom:2px solid #dee2e6;">
+          <th style="padding:0.75rem 1rem; text-align:left; color:#6c757d; font-weight:600;">ID</th>
+          <th style="padding:0.75rem 1rem; text-align:left; color:#6c757d; font-weight:600;">Código</th>
+          <th style="padding:0.75rem 1rem; text-align:left; color:#6c757d; font-weight:600;">País</th>
+          <th style="padding:0.75rem 1rem; text-align:left; color:#6c757d; font-weight:600;">Ano</th>
+          <th style="padding:0.75rem 1rem; text-align:right; color:#6c757d; font-weight:600;">PIB (bilhões USD)</th>
+          <th style="padding:0.75rem 1rem; text-align:center; color:#6c757d; font-weight:600;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
+        <tr style="border-bottom:1px solid #f1f1f1; transition:background 0.15s;" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background=''">
+          <td style="padding:0.7rem 1rem; color:#999;">#{{ r.id }}</td>
+          <td style="padding:0.7rem 1rem;">
+            <span style="background:#e8f4fd; color:#0f3460; padding:0.2rem 0.5rem; border-radius:4px; font-weight:600; font-size:0.85rem;">{{ r.country_code }}</span>
+          </td>
+          <td style="padding:0.7rem 1rem; font-weight:500;">{{ r.country_name }}</td>
+          <td style="padding:0.7rem 1rem;">{{ r.year }}</td>
+          <td style="padding:0.7rem 1rem; text-align:right; font-family:monospace;">
+            ${{ "%.2f"|format(r.gdp_billion) }}B
+          </td>
+          <td style="padding:0.7rem 1rem; text-align:center;">
+            <a href="{{ url_for('edit', record_id=r.id) }}" class="btn btn-warning btn-sm">Editar</a>
+            <form method="POST" action="{{ url_for('delete', record_id=r.id) }}" style="display:inline;" onsubmit="return confirm('Remover este registro?')">
+              <button type="submit" class="btn btn-danger btn-sm">Remover</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:0.75rem; font-size:0.85rem; color:#999;">{{ records|length }} registro(s) encontrado(s)</p>
+  {% else %}
+  <div style="text-align:center; padding:3rem; color:#aaa;">
+    <p style="font-size:1.1rem; margin-bottom:0.75rem;">Nenhum registro encontrado.</p>
+    {% if not search %}
+      <a href="{{ url_for('create') }}" class="btn btn-success">Criar o primeiro registro</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
