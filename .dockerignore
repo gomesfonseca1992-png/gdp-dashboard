@@ -1,0 +1,12 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+*.db
+data/records.db
+streamlit_app.py
+flask_app.py
+templates/base.html
+templates/index.html
+templates/form.html
+static/

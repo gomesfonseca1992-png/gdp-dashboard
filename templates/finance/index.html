@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Summary cards -->
+<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.5rem;">
+
+  <div class="card" style="border-color:{% if saldo >= 0 %}rgba(0,200,150,.4){% else %}rgba(255,77,109,.4){% endif %};">
+    <p style="font-size:0.75rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:.5rem;">Saldo</p>
+    <p style="font-size:1.75rem; font-weight:700; color:{% if saldo >= 0 %}var(--green){% else %}var(--red){% endif %};">
+      R$ {{ "%.2f"|format(saldo)|replace(".", ",") }}
+    </p>
+  </div>
+
+  <div class="card">
+    <p style="font-size:0.75rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:.5rem;">Receitas</p>
+    <p style="font-size:1.75rem; font-weight:700; color:var(--green);">
+      R$ {{ "%.2f"|format(total_receitas)|replace(".", ",") }}
+    </p>
+  </div>
+
+  <div class="card">
+    <p style="font-size:0.75rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:.5rem;">Despesas</p>
+    <p style="font-size:1.75rem; font-weight:700; color:var(--red);">
+      R$ {{ "%.2f"|format(total_despesas)|replace(".", ",") }}
+    </p>
+  </div>
+
+</div>
+
+<!-- Filters + add button -->
+<div class="card" style="margin-bottom:1rem; padding:1rem 1.5rem;">
+  <form method="GET" style="display:flex; gap:.75rem; align-items:flex-end; flex-wrap:wrap;">
+    <div style="flex:1; min-width:140px;">
+      <label>Tipo</label>
+      <select name="tipo">
+        <option value="" {% if not filtro_tipo %}selected{% endif %}>Todos</option>
+        <option value="receita" {% if filtro_tipo=='receita' %}selected{% endif %}>Receitas</option>
+        <option value="despesa" {% if filtro_tipo=='despesa' %}selected{% endif %}>Despesas</option>
+      </select>
+    </div>
+    <div style="flex:1; min-width:140px;">
+      <label>Mês</label>
+      <select name="mes">
+        <option value="">Todos os meses</option>
+        {% for m in meses %}
+          <option value="{{ m }}" {% if filtro_mes==m %}selected{% endif %}>{{ m }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-ghost">Filtrar</button>
+    {% if filtro_tipo or filtro_mes %}
+      <a href="{{ url_for('index') }}" class="btn btn-ghost">Limpar</a>
+    {% endif %}
+    <a href="{{ url_for('create') }}" class="btn btn-success" style="margin-left:auto;">+ Novo</a>
+  </form>
+</div>
+
+<!-- Transactions table -->
+<div class="card" style="padding:0; overflow:hidden;">
+  {% if transactions %}
+  <div style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse; font-size:.9rem;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--border);">
+          <th style="padding:.75rem 1.25rem; text-align:left; color:var(--muted); font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em;">Data</th>
+          <th style="padding:.75rem 1rem; text-align:left; color:var(--muted); font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em;">Tipo</th>
+          <th style="padding:.75rem 1rem; text-align:left; color:var(--muted); font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em;">Categoria</th>
+          <th style="padding:.75rem 1rem; text-align:left; color:var(--muted); font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em;">Descrição</th>
+          <th style="padding:.75rem 1.25rem; text-align:right; color:var(--muted); font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em;">Valor</th>
+          <th style="padding:.75rem 1.25rem; text-align:center; color:var(--muted); font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in transactions %}
+        <tr style="border-bottom:1px solid rgba(48,54,61,.5); transition:background .15s;"
+            onmouseover="this.style.background='rgba(255,255,255,.03)'"
+            onmouseout="this.style.background=''">
+          <td style="padding:.7rem 1.25rem; color:var(--muted); font-size:.85rem; white-space:nowrap;">
+            {{ t.data }}
+          </td>
+          <td style="padding:.7rem 1rem;">
+            {% if t.tipo == 'receita' %}
+              <span style="background:rgba(0,200,150,.15); color:var(--green); padding:.2rem .55rem; border-radius:20px; font-size:.78rem; font-weight:600;">Receita</span>
+            {% else %}
+              <span style="background:rgba(255,77,109,.15); color:var(--red); padding:.2rem .55rem; border-radius:20px; font-size:.78rem; font-weight:600;">Despesa</span>
+            {% endif %}
+          </td>
+          <td style="padding:.7rem 1rem; color:var(--muted); font-size:.88rem;">{{ t.categoria }}</td>
+          <td style="padding:.7rem 1rem; font-weight:500;">{{ t.descricao }}</td>
+          <td style="padding:.7rem 1.25rem; text-align:right; font-family:monospace; font-weight:600;
+                     color:{% if t.tipo == 'receita' %}var(--green){% else %}var(--red){% endif %};">
+            {% if t.tipo == 'receita' %}+{% else %}-{% endif %}R$ {{ "%.2f"|format(t.valor)|replace(".", ",") }}
+          </td>
+          <td style="padding:.7rem 1.25rem; text-align:center; white-space:nowrap;">
+            <a href="{{ url_for('edit', doc_id=t.id) }}" class="btn btn-ghost btn-sm">Editar</a>
+            <form method="POST" action="{{ url_for('delete', doc_id=t.id) }}" style="display:inline;"
+                  onsubmit="return confirm('Remover este lançamento?')">
+              <button type="submit" class="btn btn-danger btn-sm">Remover</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p style="padding:.75rem 1.25rem; font-size:.8rem; color:var(--muted);">{{ transactions|length }} lançamento(s)</p>
+  {% else %}
+  <div style="text-align:center; padding:3.5rem; color:var(--muted);">
+    <p style="font-size:1rem; margin-bottom:1rem;">Nenhum lançamento encontrado.</p>
+    {% if not filtro_tipo and not filtro_mes %}
+      <a href="{{ url_for('create') }}" class="btn btn-success">Adicionar o primeiro lançamento</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
