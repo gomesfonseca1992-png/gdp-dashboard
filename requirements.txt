@@ -1,3 +1,5 @@
 streamlit
 pandas
 flask
+google-cloud-firestore
+gunicorn
